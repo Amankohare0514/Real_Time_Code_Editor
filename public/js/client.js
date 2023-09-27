@@ -89,13 +89,10 @@ window.onload = function () {
             socket.off('members');
         });
     }
-
     function registerUserListener() {
         handle.style.display = 'none';
         register.style.display = 'none';
         registerPage.style.display = 'none';
-
-
         const editorBlock = document.getElementById('editor-block');
         editorBlock.style.display = 'flex';
         syncValue = "";

@@ -11,13 +11,6 @@ function fastDiff(a, b, cmp, atomicChanges = false) {
 	cmp = cmp || function (a, b) {
 		return a === b;
 	};
-
-	// Convert the string (or any array-like object - eg. NodeList) to an array by using the slice() method because,
-	// unlike Array.from(), it returns array of UTF-16 code units instead of the code points of a string.
-	// One code point might be a surrogate pair of two code units. All text offsets are expected to be in code units.
-	// See ckeditor/ckeditor5#3147.
-	//
-	// We need to make sure here that fastDiff() works identical to diff().
 	if (!Array.isArray(a)) {
 		a = Array.prototype.slice.call(a);
 	}
@@ -32,14 +25,6 @@ function fastDiff(a, b, cmp, atomicChanges = false) {
 	// Transform into changes array.
 	return atomicChanges ? changeIndexesToAtomicChanges(changeIndexes, b.length) : changeIndexesToChanges(b, changeIndexes);
 }
-
-// @param {Array} arr1
-// @param {Array} arr2
-// @param {Function} cmp Comparator function.
-// @returns {Object}
-// @returns {Number} return.firstIndex Index of the first change in both values (always the same for both).
-// @returns {Number} result.lastIndexOld Index of the last common value in `arr1`.
-// @returns {Number} result.lastIndexNew Index of the last common value in `arr2`.
 function findChangeBoundaryIndexes(arr1, arr2, cmp) {
 	// Find the first difference between passed values.
 	const firstIndex = findFirstDifferenceIndex(arr1, arr2, cmp);
@@ -52,18 +37,6 @@ function findChangeBoundaryIndexes(arr1, arr2, cmp) {
 	// Remove the common part of each value and reverse them to make it simpler to find the last difference between them.
 	const oldArrayReversed = cutAndReverse(arr1, firstIndex);
 	const newArrayReversed = cutAndReverse(arr2, firstIndex);
-
-	// Find the first difference between reversed values.
-	// It should be treated as "how many elements from the end the last difference occurred".
-	//
-	// For example:
-	//
-	// 				initial	->	after cut	-> reversed:
-	// oldValue:	'321ba'	->	'21ba'		-> 'ab12'
-	// newValue:	'31xba'	->	'1xba'		-> 'abx1'
-	// lastIndex:							-> 2
-	//
-	// So the last change occurred two characters from the end of the arrays.
 	const lastIndex = findFirstDifferenceIndex(oldArrayReversed, newArrayReversed, cmp);
 
 	// Use `lastIndex` to calculate proper offset, starting from the beginning (`lastIndex` kind of starts from the end).
@@ -73,12 +46,6 @@ function findChangeBoundaryIndexes(arr1, arr2, cmp) {
 	return { firstIndex, lastIndexOld, lastIndexNew };
 }
 
-// Returns a first index on which given arrays differ. If both arrays are the same, -1 is returned.
-//
-// @param {Array} arr1
-// @param {Array} arr2
-// @param {Function} cmp Comparator function.
-// @returns {Number}
 function findFirstDifferenceIndex(arr1, arr2, cmp) {
 	for (let i = 0; i < Math.max(arr1.length, arr2.length); i++) {
 		if (arr1[i] === undefined || arr2[i] === undefined || !cmp(arr1[i], arr2[i])) {
@@ -89,28 +56,14 @@ function findFirstDifferenceIndex(arr1, arr2, cmp) {
 	return -1; // Return -1 if arrays are equal.
 }
 
-// Returns a copy of the given array with `howMany` elements removed starting from the beginning and in reversed order.
-//
-// @param {Array} arr Array to be processed.
-// @param {Number} howMany How many elements from array beginning to remove.
-// @returns {Array} Shortened and reversed array.
+
 function cutAndReverse(arr, howMany) {
 	return arr.slice(howMany).reverse();
 }
-
-// Generates changes array based on change indexes from `findChangeBoundaryIndexes` function. This function will
-// generate array with 0 (no changes), 1 (deletion or insertion) or 2 records (insertion and deletion).
-//
-// @param {Array} newArray New array for which change indexes were calculated.
-// @param {Object} changeIndexes Change indexes object from `findChangeBoundaryIndexes` function.
-// @returns {Array.<Object>} Array of changes compatible with {@link module:utils/difftochanges~diffToChanges} format.
 function changeIndexesToChanges(newArray, changeIndexes) {
 	const result = [];
 	const { firstIndex, lastIndexOld, lastIndexNew } = changeIndexes;
 
-	// Order operations as 'insert', 'delete' array to keep compatibility with {@link module:utils/difftochanges~diffToChanges}
-	// in most cases. However, 'diffToChanges' does not stick to any order so in some cases
-	// (for example replacing '12345' with 'abcd') it will generate 'delete', 'insert' order.
 	if (lastIndexNew - firstIndex > 0) {
 		result.push({
 			index: firstIndex,
@@ -130,11 +83,7 @@ function changeIndexesToChanges(newArray, changeIndexes) {
 	return result;
 }
 
-// Generates array with set `equal|insert|delete` operations based on change indexes from `findChangeBoundaryIndexes` function.
-//
-// @param {Object} changeIndexes Change indexes object from `findChangeBoundaryIndexes` function.
-// @param {Number} newLength Length of the new array on which `findChangeBoundaryIndexes` calculated change indexes.
-// @returns {Array.<String>} Array of changes compatible with {@link module:utils/diff~diff} format.
+
 function changeIndexesToAtomicChanges(changeIndexes, newLength) {
 	const { firstIndex, lastIndexOld, lastIndexNew } = changeIndexes;
 
@@ -164,7 +113,6 @@ function changeIndexesToAtomicChanges(changeIndexes, newLength) {
 }
 
 function diff(a, b, cmp) {
-	// Set the comparator function.
 	cmp = cmp || function (a, b) {
 		return a === b;
 	};

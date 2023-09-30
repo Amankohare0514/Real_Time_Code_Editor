@@ -11,16 +11,16 @@ font-family: 'Rubik', sans-serif; */
   font-family: "Poppins", sans-serif;
 }
 
-/* Register Page  */
 .register-page {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   background-image: url(../img//svg.png);
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   background-color: #161d29;
   background-position: bottom;
 }

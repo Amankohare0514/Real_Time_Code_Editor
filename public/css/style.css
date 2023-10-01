@@ -126,14 +126,14 @@ font-family: 'Rubik', sans-serif; */
 }
 
 .list-group-item {
-  color: #ffffff;
+  color: white;
   list-style: none;
   font-family: "PT Serif", serif;
   font-weight: bolder;
   border: 1px solid white;
-  border-radius: 10%;
+  border-radius: 0%;
   color: #161d29;
-  background-color: #eeeade;
+  background-color: rgb(245, 234, 234);
   padding: 2px;
   margin: 4px;
 }
